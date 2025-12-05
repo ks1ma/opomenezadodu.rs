@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpomeneZaDodu.rs</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1e1e1e;
+      --text: #ffffff;
+      --accent: #4f8cff;
+      --danger: #ff4f4f;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .input-box {
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--card);
+      border: 1px solid #333;
+      color: white;
+    }
+
+    button {
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      font-weight: bold;
+    }
+
+    ul {
+      margin-top: 25px;
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: var(--card);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .edit { background: #ffaa2b; }
+    .delete { background: var(--danger); }
+
+  </style>
+</head>
+<body>
+  <h1>OpomeneZaDodu.rs</h1>
+
+  <div class="input-box">
+    <input id="unos" type="text" placeholder="Upiši opomenu" />
+    <button onclick="dodaj()">Dodaj</button>
+  </div>
+
+  <ul id="lista"></ul>
+
+  <script>
+    let lozinka = "doda123"; // samo ti možeš da edituješ i brišeš
+
+    function ucitaj() {
+      const data = JSON.parse(localStorage.getItem("opomene")) || [];
+      data.forEach(text => napraviLi(text));
+    }
+
+    function sacuvaj() {
+      const stavke = [...document.querySelectorAll('li span')].map(s => s.textContent);
+      localStorage.setItem("opomene", JSON.stringify(stavke));
+    }
+
+    function napraviLi(tekst) {
+      const lista = document.getElementById('lista');
+      const li = document.createElement('li');
+
+      const span = document.createElement('span');
+      span.textContent = tekst;
+
+      const btnBox = document.createElement('div');
+      btnBox.className = 'btns';
+
+      const editBtn = document.createElement('button');
+      editBtn.textContent = 'Edit';
+      editBtn.className = 'edit';
+      editBtn.onclick = () => edituj(span);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'X';
+      deleteBtn.className = 'delete';
+      deleteBtn.onclick = () => obrisi(li);
+
+      btnBox.appendChild(editBtn);
+      btnBox.appendChild(deleteBtn);
+
+      li.appendChild(span);
+      li.appendChild(btnBox);
+      lista.appendChild(li);
+    }
+
+    function dodaj() {
+      const input = document.getElementById('unos');
+      if (input.value.trim() === '') return;
+      napraviLi(input.value);
+      sacuvaj();
+      input.value = '';
+    }
+
+    function provera() {
+      const unos = prompt("Unesi lozinku za izmenu:");
+      return unos === lozinka;
+    }
+
+    function edituj(span) {
+      if (!provera()) return alert("Nemaš dozvolu!");
+      const novo = prompt("Izmeni tekst:", span.textContent);
+      if (novo) {
+        span.textContent = novo;
+        sacuvaj();
+      }
+    }
+
+    function obrisi(li) {
+      if (!provera()) return alert("Nemaš dozvolu!");
+      li.remove();
+      sacuvaj();
+    }
+
+    ucitaj();
+  </script>
+</body>
+</html>
